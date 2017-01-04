@@ -71,7 +71,7 @@ repositories {
 // In this section you declare the dependencies for your production and test code
 dependencies {
 
-    compile 'com.github.zsibritajanos:magyarlanc:master-SNAPSHOT'
+    compile 'com.github.jitpack:gradle-simple:master-SNAPSHOT'
 
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.21'
