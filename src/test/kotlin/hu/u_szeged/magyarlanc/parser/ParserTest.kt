@@ -19,22 +19,22 @@ import java.io.Serializable
 
 class ParserTest() : Serializable {
     companion object {
-        const val HUN_PARSED_INDEX = "hunParsedContent"
+        const val HUN_PARSED_INDEX = "hun_parsed_content"
         @JvmStatic fun main(args: Array<String>) {
             val test = ParserTest()
-            test.writeTaggedContentToES()
-            test.readTaggedContentFromES()
+            //test.writeTaggedContentToES()
+            test.readTaggedContentFromES().show(false)
         }
     }
 
     fun writeTaggedContentToES() {
-        val jsc = getLocalSparkContext("Test NLP parser", cores = 2)
+        val jsc = getLocalSparkContext("Test NLP parser", cores = 4)
         val sparkSession = getLocalSparkSession("Test NLP parser")
 
 
         val testCorpus = constructTestDataset(jsc, sparkSession)
         testCorpus?.let {
-            taggerTest(sparkSession, testCorpus)
+            //taggerTest(sparkSession, testCorpus)
         }
         closeSpark(jsc)
     }
@@ -42,6 +42,9 @@ class ParserTest() : Serializable {
     fun taggerTest(sparkSession: SparkSession, testCorpus: Dataset<Row>) {
 
         val tagger = HunMorphParser(sparkSession)
+        val test = tagger.transform(testCorpus)
+        test?.show(false)
+
         val taggedContent = tagger.transform(testCorpus)?.toJavaRDD()?.map { row ->
             println(row.schema())
             val parsedSentences = row.getList<WrappedArray<WrappedArray<String>>>(3)
@@ -53,7 +56,6 @@ class ParserTest() : Serializable {
             })
         }
 
-        //println(lemmatized?.collect()?.joinToString("\n"))
         val taggedDataset = taggedContent?.convertRDDToDF(sparkSession)
         JavaEsSparkSQL.saveToEs(taggedDataset, "$HUN_PARSED_INDEX/taggedContent")
     }
@@ -68,7 +70,7 @@ class ParserTest() : Serializable {
                 .set("num-executors", "3")
                 .set("executor-cores", "4")
                 .set("executor-memory", "4G")
-                .set("es.read.field.as.array.include", "MorphParsedContent, taggedContent.taggedSentence")
+                .set("es.read.field.as.array.include", "morphParsedContent, morphParsedContent.morphSentence")
 
         val jsc = JavaSparkContext(sparkConf)
 
