@@ -15,7 +15,7 @@ data class TestData(val id: Int, val text: String) : Serializable
 
 fun constructTestDataset(jsc: JavaSparkContext, sparkSession: SparkSession): Dataset<Row>? {
     val test = LinkedList<Tuple2<Int, String>>()
-    test.add(Tuple2(1, "Menko az egy fasz"))
+    test.add(Tuple2(1, "A magyarlanc nem thread safe."))
     test.add(Tuple2(2, "Az előrejelzés szerint az országos havazás a Duna-Tisza közén csütörtökön is megmaradhat, ott gyenge hóesésre kell számítani, míg máshol csak elszórt hózáporok fordulhatnak elő, és lesz, ahol hosszabb időre még a nap is kisüt. Csütörtök hajnalban mínusz 7 - mínusz 1, napközben mínusz 3 - plusz 3 fokra kell számítani."))
     test.add(Tuple2(3, "Ennél jóval zordabb lesz az idő péntek hajnalban, amikor akár mínusz 15 fokig is süllyedhet a hőmérséklet, és napközben sem lesz melegebb mínusz 10 - mínusz 3 foknál - Északkeleten lesz a leghidegebb."))
     test.add(Tuple2(4, "Pénteken az ország nagy részén derült, csapadékmentes idő várható, bár nyugaton néhol előfordulhat még futó hózápor. Az északi szél több helyen megerősödik, és viharossá fokozódik."))
