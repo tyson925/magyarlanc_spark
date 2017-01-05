@@ -22,13 +22,13 @@ class ParserTest() : Serializable {
         const val HUN_PARSED_INDEX = "hun_parsed_content"
         @JvmStatic fun main(args: Array<String>) {
             val test = ParserTest()
-            //test.writeTaggedContentToES()
+            test.writeTaggedContentToES()
             test.readTaggedContentFromES().show(false)
         }
     }
 
     fun writeTaggedContentToES() {
-        val jsc = getLocalSparkContext("Test NLP parser", cores = 4)
+        val jsc = getLocalSparkContext("Test NLP parser", cores = 1)
         val sparkSession = getLocalSparkSession("Test NLP parser")
 
 
@@ -81,11 +81,8 @@ class ParserTest() : Serializable {
 
 
         val res = documents.toJavaRDD().map { row ->
-            //println(row.schema())
             val data = row.getSeq<Row>(0)
 
-            //val data = row.getAs<WrappedArray<WrappedArray<*>>>(0)
-            println(data.javaClass.kotlin)
             val res = JavaConversions.asJavaCollection(data)
             MorphParsedContent(res.map { row1 ->
                 val sentence = JavaConversions.asJavaCollection(row1.getSeq<Row>(0))

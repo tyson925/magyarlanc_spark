@@ -1,4 +1,4 @@
-package hu.u_szeged.magyarlanc.spark.morphParse
+package hu.u_szeged.magyarlanc.spark.depParse
 
 import hu.u_szeged.magyarlanc.spark.tokenizer.tokenizedContent
 import org.apache.spark.ml.Transformer
@@ -15,48 +15,50 @@ import scala.collection.JavaConversions
 import scala.collection.mutable.WrappedArray
 import java.io.Serializable
 
-data class MorphParsedToken(var token : String, var lemma : String, var purePos : String, var msd : String) : Serializable
-data class MorphSentence(var morphSentence: List<MorphParsedToken>) : Serializable
-data class MorphParsedContent(var morphParsedContent : List<MorphSentence>) : Serializable
+data class DepParsedToken(var index : Int, var token : String, var lemma : String, var purePos : String, var msd : String, var head : Int, var parse : String) : Serializable
+data class DepParsedSentence(var depParsedSentence: List<DepParsedToken>) : Serializable
+data class DepParsedContent(var depParsedContent: List<DepParsedSentence>) : Serializable
 
-const val morhpOutputColName = "morphContent"
 
-class HunMorphParser : Transformer {
+const val depOutputColName = "depContent"
 
-    val morphTagger: MorphParseWrapper
-    val udfName = "morphParser"
+class HunDepParser : Transformer {
+
+
+    val depParser: DepParserWrapper
+    val udfName = "depParser"
     val sparkSession: SparkSession
     var inputColName: String
     var outputColName: String
 
+
     constructor(sparkSession: SparkSession, inputColName: String = tokenizedContent) {
         this.sparkSession = sparkSession
         this.inputColName = inputColName
-        this.outputColName = morhpOutputColName
-        this.morphTagger = MorphParseWrapper()
+        this.outputColName = depOutputColName
+        this.depParser = DepParserWrapper()
 
-        val tagger = UDF1 { sentences: WrappedArray<WrappedArray<String>> ->
-            val morphTagger = this.morphTagger.get()
+        val parser = UDF1 { sentences: WrappedArray<WrappedArray<String>> ->
+            val depParser = this.depParser.get()
 
             val sentencesJava = JavaConversions.asJavaCollection(sentences)
 
             val results = sentencesJava.map { sentence ->
-                morphTagger.morphParseSentence(JavaConversions.seqAsJavaList(sentence))
+                depParser.parseSentence(JavaConversions.seqAsJavaList(sentence).toTypedArray())
             }
 
             results.toTypedArray()
         }
 
-        this.sparkSession.udf().register(udfName, tagger, DataTypes.createArrayType(DataTypes.createArrayType(DataTypes.createArrayType(DataTypes.StringType))))
+        this.sparkSession.udf().register(udfName, parser, DataTypes.createArrayType(DataTypes.createArrayType(DataTypes.createArrayType(DataTypes.StringType))))
 
     }
-
-    fun setInputColName(inputColName: String): HunMorphParser {
+    fun setInputColName(inputColName: String): HunDepParser {
         this.inputColName = inputColName
         return this
     }
 
-    fun setOutputColName(outputColName: String): HunMorphParser {
+    fun setOutputColName(outputColName: String): HunDepParser {
         this.outputColName = outputColName
         return this
     }
@@ -67,7 +69,7 @@ class HunMorphParser : Transformer {
     }
 
     override fun copy(p0: ParamMap?): Transformer {
-        return HunMorphParser(this.sparkSession)
+        return HunDepParser(this.sparkSession)
     }
 
     override fun transform(dataset: Dataset<*>?): Dataset<Row>? {
