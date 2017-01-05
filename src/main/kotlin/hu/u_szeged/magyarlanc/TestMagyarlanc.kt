@@ -8,7 +8,7 @@ class TestMagyarlanc() {
         @JvmStatic fun main(args: Array<String>) {
             //println(MySplitter.getInstance().split("Menko az egy fasz"))
             Magyarlanc.depInit()
-            println(Magyarlanc.depParse("Menko az egy fasz").map { token ->
+            println(Magyarlanc.constParse("Menko az egy fasz").map { token ->
                 token.map { data -> data.toList() }
             }.joinToString(" "))
         }

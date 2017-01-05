@@ -1,5 +1,6 @@
-package hu.u_szeged.magyarlanc.spark.depParse
+package hu.u_szeged.magyarlanc.spark.constituensParse
 
+import hu.u_szeged.magyarlanc.spark.depParse.depOutputColName
 import hu.u_szeged.magyarlanc.spark.tokenizer.tokenizedContent
 import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.param.ParamMap
@@ -15,16 +16,17 @@ import scala.collection.JavaConversions
 import scala.collection.mutable.WrappedArray
 import java.io.Serializable
 
-data class DepParsedToken(var index : Int, var token : String, var lemma : String, var purePos : String, var msd : String, var head : Int, var parse : String) : Serializable
-data class DepParsedSentence(var depParsedSentence: List<DepParsedToken>) : Serializable
-data class DepParsedContent(var depParsedContent: List<DepParsedSentence>) : Serializable
+
+data class ConstParsedToken(var token : String, var lemma : String, var purePos : String, var msd : String, var const : String) : Serializable
+data class ConstParsedSentence(var constSentence: List<ConstParsedToken>) : Serializable
+data class ConstParsedContent(var constParsedContent : List<ConstParsedSentence>) : Serializable
 
 
-const val depOutputColName = "depContent"
+const val constOutputColName = "constContent"
 
-class HunDepParser : Transformer {
+class HunConstParser : Transformer {
 
-    val depParser: DepParserWrapper
+    val constParser: ConstParserWrapper
     val udfName = "constParser"
     val sparkSession: SparkSession
     var inputColName: String
@@ -35,15 +37,15 @@ class HunDepParser : Transformer {
         this.sparkSession = sparkSession
         this.inputColName = inputColName
         this.outputColName = depOutputColName
-        this.depParser = DepParserWrapper()
+        this.constParser = ConstParserWrapper()
 
         val parser = UDF1 { sentences: WrappedArray<WrappedArray<String>> ->
-            val depParser = this.depParser.get()
+            val constParser = this.constParser.get()
 
             val sentencesJava = JavaConversions.asJavaCollection(sentences)
 
             val results = sentencesJava.map { sentence ->
-                depParser.parseSentence(JavaConversions.seqAsJavaList(sentence).toTypedArray())
+                constParser.parseSentence(JavaConversions.seqAsJavaList(sentence).toTypedArray())
             }
 
             results.toTypedArray()
@@ -53,12 +55,13 @@ class HunDepParser : Transformer {
 
     }
 
-    fun setInputColName(inputColName: String): HunDepParser {
+
+    fun setInputColName(inputColName: String): HunConstParser {
         this.inputColName = inputColName
         return this
     }
 
-    fun setOutputColName(outputColName: String): HunDepParser {
+    fun setOutputColName(outputColName: String): HunConstParser {
         this.outputColName = outputColName
         return this
     }
@@ -69,7 +72,7 @@ class HunDepParser : Transformer {
     }
 
     override fun copy(p0: ParamMap?): Transformer {
-        return HunDepParser(this.sparkSession)
+        return HunConstParser(this.sparkSession)
     }
 
     override fun transform(dataset: Dataset<*>?): Dataset<Row>? {
