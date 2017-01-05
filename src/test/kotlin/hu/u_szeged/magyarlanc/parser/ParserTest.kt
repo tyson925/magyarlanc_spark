@@ -88,10 +88,10 @@ class ParserTest() : Serializable {
                 val sentence = JavaConversions.asJavaCollection(row1.getSeq<Row>(0))
                 MorphSentence(
                         sentence.map { parsedToken ->
-                            val token = parsedToken.getAs<String>("token")
-                            val lemma = parsedToken.getAs<String>("lemma")
-                            val purePos = parsedToken.getAs<String>("purePos")
-                            val msd = parsedToken.getAs<String>("msd")
+                            val token = parsedToken.getAs<String>(MorphParsedToken::token.name)
+                            val lemma = parsedToken.getAs<String>(MorphParsedToken::lemma.name)
+                            val purePos = parsedToken.getAs<String>(MorphParsedToken::purePos.name)
+                            val msd = parsedToken.getAs<String>(MorphParsedToken::msd.name)
                             MorphParsedToken(token, lemma, purePos, msd)
                         })
             })
