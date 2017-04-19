@@ -1,6 +1,6 @@
 # magyarlanc_spark
 
-Apache Spark wrapper for Magyarlanc to process Hungarian raw texts.
+Apache Spark wrapper for Magyarlanc to process Hungarian big data raw texts.
 
 You can `tokenize`, `lemmatize`, `POS-tag` and `dependecy parsing` Hungarian contents and should store the results into ElasticSearch if you want. 
 
