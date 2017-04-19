@@ -17,7 +17,7 @@ import scala.collection.mutable.WrappedArray
 import java.io.Serializable
 
 
-class ConstParserTest() : Serializable {
+class ConstParserTest : Serializable {
     companion object {
         const val HUN_CONSTPARSED_INDEX = "hun_constparsed_content"
         @JvmStatic fun main(args: Array<String>) {

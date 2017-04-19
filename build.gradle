@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 description 'magyarlanc on spark'
 
 buildscript {
-    ext.kotlin_version = '1.0.5'
+    ext.kotlin_version = '1.0.6'
     repositories {
         maven {
             url "https://collokia.artifactoryonline.com/collokia/collokia-internal"
